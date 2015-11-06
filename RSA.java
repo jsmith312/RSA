@@ -39,42 +39,26 @@ public class RSA {
             RSAdecrypt(m, nStr, dStr);
         }
         
-        /*BigInteger j = RSAEncrpyt("6882326879666683",79,3337);
-         System.out.println(j);
-         System.out.println(j.toString(16)); // report as BigInt;
-         String k = RSADecrypt(j.toString(16), 1019, 3337);
-         System.out.println(k); // report as BigInt;*/
     }
     
+    /**
+     * RSA Encryption
+     * @param M, e, n
+     */
     public static BigInteger RSAEncrpyt(String M, String e, String n) {
-        //int arr[] = splitMessage(M); // split message into array of
         String ret[];
         BigInteger N = new BigInteger(n+"", 16);
         BigInteger E = new BigInteger(e+"", 16);
-
         String buff = computeMod(M.toString(), E.toString(), N.toString());
         BigInteger retVal = new BigInteger(buff.toString());
         System.out.println("Cipher Text: " + retVal.toString(16));
         return retVal;
     }
     
-    private static void modExp(BigInteger big, BigInteger exp, BigInteger mod){
-        BigInteger q = BigInteger.valueOf(1), m = exp, square = big;
-        while(m.compareTo(BigInteger.valueOf(1)) >= 0){
-            if(m.mod(BigInteger.valueOf(2)).compareTo(BigInteger.valueOf(0)) != 0){
-                big = q.multiply(square).mod(mod);
-            }
-            square = square.multiply(square).mod(mod);
-            m = m.divide(BigInteger.valueOf(2));
-        }
-        System.out.println(q);
-        System.out.println(big);
-        System.out.println(mod);
-        System.out.println(m);
-        System.out.println(square);
-        
-    }
-    
+    /**
+     * Helper Method for computing the modulus of e/d
+     * @param M, e, n
+     **/
     public static String computeMod(String m, String e, String n) {
         BigInteger mess = new BigInteger(m+"");
         BigInteger np = new BigInteger(n);
@@ -84,47 +68,15 @@ public class RSA {
     }
     
     /**
-     * Splits the message into 3 chunks
-     * @param M (Message to encrypt)
-     * @return blocks, String[] of every 3 chunks of the M, with padding
-     */
-    private static String[] splitMessage(String M) {
-        String blocks[] = (M+"").split("(?<=\\G.{3})");
-        int ret[] = new int[blocks.length];
-        for (int i = 0; i < blocks.length; i++) {
-            if (blocks[i].length() < 3) {
-                // pad the Long
-                if (blocks[i].length() == 1) {
-                    blocks[i] = "00"+blocks[i];
-                } else {
-                    blocks[i] = "0"+blocks[i];
-                }
-            }
-        }
-        return blocks;
-    }
-    
-    /**
-     * TODO: You need to write the DES decryption here.
+     * RSA decryption
      * @param C, d, n
      */
     public static String RSADecrypt(String C, String d, String n) {
-        //System.out.println(C);
         BigInteger D = new BigInteger(d, 16);
         // convert from Hex to BigInteger
         BigInteger N = new BigInteger(n+"", 16);
         BigInteger c = new BigInteger(C, 16);
-        //System.out.println(c);
-        //String blocks[] = (c+"").split("(?<=\\G.{4})");
-        String blocks[] = new String[1];
-        blocks[0] = c.toString();
-        String dp[] = new String[blocks.length];
-        StringBuffer buff = new StringBuffer();
-        for (int i=0; i < blocks.length; i++) {
-            dp[i] = computeMod(blocks[i].toString(), D.toString(), N.toString());
-            buff.append(dp[i]);
-        }
-        
+        String buff = computeMod(c.toString(), D.toString(), N.toString());
         BigInteger retVal = new BigInteger(buff.toString());
         System.out.println("Plain Text: " + retVal);
         return "";
