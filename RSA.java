@@ -131,7 +131,7 @@ public class RSA {
         genE();
         genD();
         
-        //System.out.println(n.bitLength());
+        System.out.println(n.bitLength());
         System.out.println("e: " + e.toString(16));
         System.out.println();
         System.out.println("d: " + d.toString(16));
@@ -277,6 +277,7 @@ public class RSA {
                 	simp = true;
                     break;
                 case 'b':
+                	simp = false;
                     arg = g.getOptarg();
                     bitSizeStr.append(arg);
                     break;
