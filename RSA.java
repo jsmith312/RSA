@@ -46,25 +46,15 @@ public class RSA {
          System.out.println(k); // report as BigInt;*/
     }
     
-    public static BigInteger RSAEncrpyt(String M, int e, String n) {
+    public static BigInteger RSAEncrpyt(String M, String e, String n) {
         //int arr[] = splitMessage(M); // split message into array of
         String ret[];
         BigInteger N = new BigInteger(n+"", 16);
         BigInteger E = new BigInteger(e+"", 16);
-        // split the long value and include padding
-        ret = splitMessage(M);
-        // the cipher chunks
-        String c[] = new String[ret.length];
-        StringBuffer buff = new StringBuffer();
-        for (int i=0; i < ret.length; i++) {
-            c[i] = computeMod(ret[i], e, N.toString());
-            // System.out.println(c[i]);
-            buff.append(c[i]);
-            //modExp(new BigInteger(ret[i]), E, N);
-            //System.out.println(c[i]);
-        }
+
+        String buff = computeMod(M.toString(), E.toString(), N.toString());
         BigInteger retVal = new BigInteger(buff.toString());
-        System.out.println(retVal.toString(16));
+        System.out.println("Cipher Text: " + retVal.toString(16));
         return retVal;
     }
     
@@ -85,15 +75,11 @@ public class RSA {
         
     }
     
-    public static String computeMod(String m, int e, String n) {
+    public static String computeMod(String m, String e, String n) {
         BigInteger mess = new BigInteger(m+"");
         BigInteger np = new BigInteger(n);
-        BigInteger E = new BigInteger(e+"");
-        //BigInteger ret = mess.pow(e);
-        //BigInteger retV = ret.mod(np);
-        
+        BigInteger E = new BigInteger(e);
         BigInteger retV = mess.modPow(E, np);
-        //System.out.println(retV.toString());
         return retV.toString();
     }
     
@@ -123,23 +109,24 @@ public class RSA {
      * @param C, d, n
      */
     public static String RSADecrypt(String C, String d, String n) {
-        System.out.println("DECRYPT: ");
         //System.out.println(C);
-        BigInteger D = new BigInteger(d,16);
+        BigInteger D = new BigInteger(d, 16);
         // convert from Hex to BigInteger
         BigInteger N = new BigInteger(n+"", 16);
         BigInteger c = new BigInteger(C, 16);
         //System.out.println(c);
-        String blocks[] = (c+"").split("(?<=\\G.{4})");
-        
+        //String blocks[] = (c+"").split("(?<=\\G.{4})");
+        String blocks[] = new String[1];
+        blocks[0] = c.toString();
         String dp[] = new String[blocks.length];
         StringBuffer buff = new StringBuffer();
         for (int i=0; i < blocks.length; i++) {
-            dp[i] = computeMod(blocks[i].toString(), D.intValue(), N.toString());
+            dp[i] = computeMod(blocks[i].toString(), D.toString(), N.toString());
             buff.append(dp[i]);
         }
+        
         BigInteger retVal = new BigInteger(buff.toString());
-        System.out.println(retVal);
+        System.out.println("Plain Text: " + retVal);
         return "";
     }
     
@@ -147,7 +134,7 @@ public class RSA {
         //System.out.println("E (hex): " + eStr.toString());
         BigInteger e = new BigInteger(eStr.toString(), 16);
         //System.out.println("E (int): " + e);
-        RSAEncrpyt(m.toString(), e.intValue(), nStr.toString());
+        RSAEncrpyt(m.toString(), eStr.toString(), nStr.toString());
     }
     
     private static void RSAdecrypt(StringBuilder cStr, StringBuilder nStr,
@@ -178,14 +165,11 @@ public class RSA {
         genD();
         
         //System.out.println(n.bitLength());
-        System.out.println("e (hex): " + e.toString(16));
-        System.out.println("e (int): " + e.toString(10));
+        System.out.println("e: " + e.toString(16));
         System.out.println();
-        System.out.println("d (hex): " + d.toString(16));
-        System.out.println("d (int): " + d.toString(10));
+        System.out.println("d: " + d.toString(16));
         System.out.println();
-        System.out.println("n (hex): " + n.toString(16));
-        System.out.println("n (int): " + n.toString(10));
+        System.out.println("n: " + n.toString(16));
         
     }
     /**
@@ -195,7 +179,7 @@ public class RSA {
      * Ensure bit_size is divisible by 8
      */
     private static void setSize(int size){
-        while(size % 8 != 0){
+        while(size % 8 != 0) {
             size+=1;
         }
         bit_size = size;
@@ -221,7 +205,7 @@ public class RSA {
             }
             p = new BigInteger(pSet.toByteArray()).abs();
             
-            if(p.isProbablePrime(10)){
+            if(p.isProbablePrime(100)){
                 break;
             }
             
@@ -241,7 +225,7 @@ public class RSA {
             }
             q = new BigInteger(qSet.toByteArray()).abs();
             
-            if(q.isProbablePrime(10)){
+            if(q.isProbablePrime(100)){
                 break;
             }
         }
@@ -279,7 +263,7 @@ public class RSA {
         i = rand.nextInt((1000-3)+1)+1;
         BigInteger j = BigInteger.valueOf(i);
         for(;;){
-            if(j.isProbablePrime(10) && phi_n.longValue() % i != 0 && i % 2 != 0 && phi_n.gcd(j).compareTo(BigInteger.valueOf(1)) == 0){
+            if(j.isProbablePrime(100) && phi_n.longValue() % i != 0 && i % 2 != 0 && phi_n.gcd(j).compareTo(BigInteger.valueOf(1)) == 0){
                 e = BigInteger.valueOf(i).abs();
                 return;
             }else{
@@ -294,7 +278,6 @@ public class RSA {
      * compute d
      */
     private static void genD(){
-        System.out.println(phi_n);
         d = e.modInverse(phi_n);
     }
     
@@ -347,7 +330,13 @@ public class RSA {
     
     private static void callUsage(int exitStatus) {
         
-        String useage = "";
+        String useage = "\'i\' - designates plaintext value for encrypt and ciphertext value for decrypt\n"
+            + "\'e\' - designates public key\n"
+            + "\'n\' - designates n value for both encrypt and decrypt\n"
+            + "\'d\' - designates private key\n"
+            + "\'k\' - generates key\n"
+            + "\'b\' - designates bit size for key generation\n"
+            + "\'h\' - lists cammand line options for this program\n";
         
         System.err.println(useage);
         System.exit(exitStatus);
