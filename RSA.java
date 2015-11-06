@@ -1,3 +1,9 @@
+/**
+ * @authors Jordan Smith, Chris Pawlik
+ * CSc 466
+ * Assignment 5
+ * 
+ */
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.BitSet;
@@ -16,6 +22,7 @@ public class RSA {
     static private BigInteger d;
     static private BitSet pSet;
     static private BitSet qSet;
+    static private boolean simp = false;
     
     public static void main(String[] args) {
         StringBuilder bitSizeStr = new StringBuilder();
@@ -26,9 +33,12 @@ public class RSA {
         
         pcl(args, bitSizeStr, nStr, dStr, eStr,m);
         
-        if(!bitSizeStr.toString().equalsIgnoreCase("")){
+        if(simp == false && !bitSizeStr.toString().equalsIgnoreCase("")){
             //This means you want to create a new key
             genRSAkey(bitSizeStr);
+        }else if(simp == true){
+        	//"100" will let genKey() know to set as 1024
+        	genRSAkey(bitSizeStr.append("100"));
         }
         
         if(!eStr.toString().equalsIgnoreCase("")){
@@ -82,6 +92,11 @@ public class RSA {
         return "";
     }
     
+    /**
+     * RSAencrypt()
+     * 
+     * @param m, nStrm, eStr
+     */
     private static void RSAencrypt(StringBuilder m, StringBuilder nStr, StringBuilder eStr) {
         //System.out.println("E (hex): " + eStr.toString());
         BigInteger e = new BigInteger(eStr.toString(), 16);
@@ -160,13 +175,7 @@ public class RSA {
             if(p.isProbablePrime(100)){
                 break;
             }
-            
-            //test prime and assign p, q
-            //if(testPrime(p.longValue())){
-            //	if(testPrime(q.longValue())){
-            //		break;
-            //	}
-            //}
+
         }
         for(;;){
             qSet = new BitSet(bit_size/2);
@@ -265,6 +274,7 @@ public class RSA {
                     dStr.append(arg);
                     break;
                 case 'k':
+                	simp = true;
                     break;
                 case 'b':
                     arg = g.getOptarg();
