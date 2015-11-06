@@ -116,6 +116,7 @@ public class RSA {
      * @param bitSizeStr
      *
      * generates session key. Takes in a StringBuilder and if valid, uses that as bit_size. Otherwise, use default 1024 bits.
+     * Tolerates key size between 1024 and 10,000 bits
      */
     private static void genRSAkey(StringBuilder bitSizeStr) {
         if(Integer.parseInt(bitSizeStr.toString()) > 1024 && Integer.parseInt(bitSizeStr.toString()) < 10000){
